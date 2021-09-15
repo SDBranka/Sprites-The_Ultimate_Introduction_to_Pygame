@@ -19,11 +19,17 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = (80, 300))
         self.gravity = 0
 
+        path_to_sound = "audio/jump.mp3"
+        self.jump_sound = pygame.mixer.Sound(path_to_sound)
+        # set sound volume. Between 0(silent) and 1(full volume)
+        self.jump_sound.set_volume(0.2)
+
     def player_input(self):
         keys = pygame.key.get_pressed()
         # if player is on the ground and space bar is pressed player jump
         if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
             self.gravity = -21
+            self.jump_sound.play()
 
     def apply_gravity(self):
         self.gravity += 1
@@ -117,7 +123,7 @@ screen_width = 800
 screen_height = 400
 screen = pygame.display.set_mode((screen_width, screen_height))
 # rename screen title
-pygame.display.set_caption('Runner')
+pygame.display.set_caption("Pixel Runner")
 
 # controlling the framerate
 clock = pygame.time.Clock()
