@@ -66,7 +66,7 @@ class Obstacle(pygame.sprite.Sprite):
         
         self.animation_index = 0
         self.image = self.frames[self.animation_index]
-        self.rect = self.image.get_rect(midbottom = (randint(100, 200), y_pos))
+        self.rect = self.image.get_rect(midbottom = (randint(900, 1100), y_pos))
 
     def animation_state(self):
         self.animation_index += 0.1
@@ -76,6 +76,7 @@ class Obstacle(pygame.sprite.Sprite):
 
     def update(self):
         self.animation_state()
+        self.rect.x -= 6
 
 
 
@@ -324,7 +325,9 @@ while True:
         screen.blit(player_surface, player_rect)
         player.draw(screen)
         player.update()
+        # display obstacles
         obstacle_group.draw(screen)
+        obstacle_group.update()
 
 
 
