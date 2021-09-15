@@ -11,19 +11,19 @@ class Player(pygame.sprite.Sprite):
         player_walk_1 = pygame.image.load("img/player/player_walk_1.png").convert_alpha()
         player_walk_2 = pygame.image.load("img/player/player_walk_2.png").convert_alpha()
         # list containing the two walk animation pics controlled by player_index
+        self.player_walk = [player_walk_1, player_walk_2]
         self.player_index = 0
         self.player_jump = pygame.image.load("img/player/jump.png").convert_alpha()
-        self.player_walk = [player_walk_1, player_walk_2]
 
         self.image = self.player_walk[self.player_index]
-        self.rect = self.image.get_rect(midbottom = (200, 300))
+        self.rect = self.image.get_rect(midbottom = (80, 300))
         self.gravity = 0
 
     def player_input(self):
         keys = pygame.key.get_pressed()
         # if player is on the ground and space bar is pressed player jump
         if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
-            self.gravity = -20
+            self.gravity = -25
 
     def apply_gravity(self):
         self.gravity += 1
@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
         else:
             # increasing the index by small increments extends how many frames an index position is displayed for
             self.player_index += 0.1
-            if self.player_index >= len(player_walk):
+            if self.player_index >= len(self.player_walk):
                 self.player_index = 0
             self.image = self.player_walk[int(self.player_index)]
 
@@ -85,8 +85,6 @@ class Obstacle(pygame.sprite.Sprite):
         self.animation_state()
         self.rect.x -= 6
         self.destroy()
-
-
 
 
 # function to consistantly update and redraw score_surface
@@ -171,52 +169,12 @@ player.add(Player())
 # create a sprite group for obstacles
 obstacle_group = pygame.sprite.Group()
 
-
-
-
-
-
-
-
 # create a surface with an image
 sky_surface = pygame.image.load('img/Sky.png').convert()
 
 # create a ground surface with an image
 ground_surface = pygame.image.load('img/ground.png').convert()
 
-# obstacles
-# animating snail
-snail_frame_1 = pygame.image.load("img/snail/snail1.png").convert_alpha()
-snail_frame_2 = pygame.image.load("img/snail/snail2.png").convert_alpha()
-snail_frames = [snail_frame_1, snail_frame_2]
-snail_frame_index = 0
-snail_surface = snail_frames[snail_frame_index]
-
-# animating fly
-fly_frame_1 = pygame.image.load("img/fly/fly1.png").convert_alpha()
-fly_frame_2 = pygame.image.load("img/fly/fly2.png").convert_alpha()
-fly_frames = [fly_frame_1, fly_frame_2]
-fly_frame_index = 0
-fly_surface = fly_frames[fly_frame_index]
-
-obstacle_rect_list = []
-
-# create player character(surface)
-# animating the player
-player_walk_1 = pygame.image.load("img/player/player_walk_1.png").convert_alpha()
-player_walk_2 = pygame.image.load("img/player/player_walk_2.png").convert_alpha()
-# list containing the two walk animation pics controlled by player_index
-player_walk = [player_walk_1, player_walk_2]
-player_index = 0
-player_jump = pygame.image.load("img/player/jump.png").convert_alpha()
-# sets the default player image to player_walk_1
-player_surface = player_walk[player_index]
-# create player rectangle that is same size as player_surface
-player_pos_x = 80
-player_pos_y = 300
-player_rect = player_surface.get_rect(midbottom = (player_pos_x, player_pos_y))
-# create gravity physics for player
-player_gravity = 0
 # creating player surface for game over/intro screen
 player_stand = pygame.image.load("img/player/player_stand.png").convert_alpha()
 pss_surface_to_use = player_stand
@@ -239,13 +197,6 @@ event_to_trigger = obstacle_timer
 how_often_to_trigger = 1500
 pygame.time.set_timer(event_to_trigger, how_often_to_trigger)
 
-# controls obstacle animation
-snail_animation_timer = pygame.USEREVENT + 2
-pygame.time.set_timer(snail_animation_timer, 500)
-
-fly_animation_timer = pygame.USEREVENT + 3
-pygame.time.set_timer(fly_animation_timer, 200)
-
 
 # game loop
 while True:
@@ -257,43 +208,11 @@ while True:
             exit()
 
         if game_active:      
-            # keystrikes   
-            # make player jump using space bar
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and player_rect.bottom >= 300:
-                    player_gravity = -27
-            # make player jump if player is clicked (1:43:15)
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if player_rect.collidepoint(event.pos) and player_rect.bottom >= 300:
-                    player_gravity = -20
-
             # timers
             # enemy/obstacle deployment timer 
             if event.type == obstacle_timer:
                 # add an instance of Obstacle to obstacle_group, the type is random 25%chance fly 75% chance snail
                 obstacle_group.add(Obstacle(choice(["fly", "snail", "snail", "snail"])))
-                # # build random obstacle type generator; randint 0/1, if 1 snail, if 0 fly
-                # if randint(0, 2):
-                #     obstacle_rect_list.append(snail_surface.get_rect(bottomright = (randint(900, 1100), 300)))
-                # else:
-                #     obstacle_rect_list.append(fly_surface.get_rect(bottomright = (randint(900, 1100), 210)))
-            
-            
-            
-            
-            # obstacle animaton timers
-            if event.type == snail_animation_timer:
-                if snail_frame_index == 0:
-                    snail_frame_index = 1
-                else:
-                    snail_frame_index = 0
-                snail_surface = snail_frames[snail_frame_index]
-            if event.type == fly_animation_timer:
-                if fly_frame_index == 0:
-                    fly_frame_index = 1
-                else:
-                    fly_frame_index = 0
-                fly_surface = fly_frames[fly_frame_index]
         else:
             # user presses space bar to restart game
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -307,45 +226,19 @@ while True:
         sky_pos_x = 0
         sky_pos_y = 0
         screen.blit(sky_surface, (sky_pos_x, sky_pos_y))
-
         # display ground_surface
-        ground_pos_x = 0
-        ground_pos_y = 300
-        screen.blit(ground_surface, (ground_pos_x, ground_pos_y))
-
+        screen.blit(ground_surface, (0, 300))
         # store score and display
         score = display_score()
-
-        # obstacle movement
-        obstacle_rect_list = obstacle_movement(obstacle_rect_list)
-
-        # apply player gravity physics
-        player_gravity +=1 
-        player_rect.y += player_gravity
-        # create floor as barrier
-        if player_rect.bottom >= 300:
-            player_rect.bottom = 300
-        # run player_animation to determine which image to show
-        player_animation()
         # display player
-        screen.blit(player_surface, player_rect)
         player.draw(screen)
         player.update()
         # display obstacles
         obstacle_group.draw(screen)
         obstacle_group.update()
 
-
-
-        # collisions
-        game_active = collisions(player_rect, obstacle_rect_list)
     # if game_active is false(new game/player death) display intro/game over screen
     else:
-        # clear all existing enemies
-        obstacle_rect_list.clear()
-        # return player_rect to start position
-        player_rect.midbottom = (80, 300)
-        player_gravity = 0
         # draw screen
         screen.fill((94, 129, 162))
         screen.blit(player_stand, player_stand_rect)
@@ -358,6 +251,7 @@ while True:
         else:
             screen.blit(score_msg, score_msg_rect)
 
+    # update what is displayed on screen
     pygame.display.update()
     # sets so that while True loop should not run faster than framerate_ceiling times per second
     framerate_ceiling = 60
