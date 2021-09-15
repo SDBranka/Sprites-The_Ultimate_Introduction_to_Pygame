@@ -56,6 +56,14 @@ class Player(pygame.sprite.Sprite):
         self.animation_state()
 
 
+
+# self.jump_sound = pygame.mixer.Sound(path_to_sound)
+# # set sound volume. Between 0(silent) and 1(full volume)
+# self.jump_sound.set_volume(0.2)
+# self.jump_sound.play()
+
+
+
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self, type):
         super().__init__()
@@ -143,6 +151,15 @@ start_time = 0
 # store the score for global use
 score = 0
 
+# bg music
+path_to_music = "audio/Juhani_Junkala_[Retro_Game_Music_Pack]_Level_1.wav"
+bg_music = pygame.mixer.Sound(path_to_music)
+# set sound volume. Between 0(silent) and 1(full volume)
+bg_music.set_volume(0.2)
+# start bg music and loop it forever
+bg_music.play(loops = -1)
+
+
 # create a GroupSingle instance of Player 
 player = pygame.sprite.GroupSingle()
 player.add(Player())
@@ -203,6 +220,8 @@ while True:
         
     # game display
     if game_active:
+        pygame.mixer.unpause()
+
         # display sky_surface
         sky_pos_x = 0
         sky_pos_y = 0
@@ -223,6 +242,7 @@ while True:
 
     # if game_active is false(new game/player death) display intro/game over screen
     else:
+        pygame.mixer.pause()
         # draw screen
         screen.fill((94, 129, 162))
         screen.blit(player_stand, player_stand_rect)
