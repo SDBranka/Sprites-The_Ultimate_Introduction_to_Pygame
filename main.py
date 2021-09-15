@@ -1,7 +1,7 @@
 import pygame
 from sys import exit
 import math
-from random import randint
+from random import randint, choice
 
 
 class Player(pygame.sprite.Sprite):
@@ -68,15 +68,24 @@ class Obstacle(pygame.sprite.Sprite):
         self.image = self.frames[self.animation_index]
         self.rect = self.image.get_rect(midbottom = (randint(900, 1100), y_pos))
 
+    # determines and sets image to display
     def animation_state(self):
         self.animation_index += 0.1
         if self.animation_index >= len(self.frames):
             self.animation_index = 0
         self.image = self.frames[int(self.animation_index)]
 
+    # if obstacle instance moves offscreen, destroy it
+    def destroy(self):
+        if self.rect.x <= -100:
+            self.kill()
+
+    # updates image display and position
     def update(self):
         self.animation_state()
         self.rect.x -= 6
+        self.destroy()
+
 
 
 
@@ -261,16 +270,13 @@ while True:
             # timers
             # enemy/obstacle deployment timer 
             if event.type == obstacle_timer:
-                # add an instance of Obstacle to obstacle_group
-                obstacle_group.add(Obstacle("fly"))
-
-
-
-                # build random obstacle type generator; randint 0/1, if 1 snail, if 0 fly
-                if randint(0, 2):
-                    obstacle_rect_list.append(snail_surface.get_rect(bottomright = (randint(900, 1100), 300)))
-                else:
-                    obstacle_rect_list.append(fly_surface.get_rect(bottomright = (randint(900, 1100), 210)))
+                # add an instance of Obstacle to obstacle_group, the type is random 25%chance fly 75% chance snail
+                obstacle_group.add(Obstacle(choice(["fly", "snail", "snail", "snail"])))
+                # # build random obstacle type generator; randint 0/1, if 1 snail, if 0 fly
+                # if randint(0, 2):
+                #     obstacle_rect_list.append(snail_surface.get_rect(bottomright = (randint(900, 1100), 300)))
+                # else:
+                #     obstacle_rect_list.append(fly_surface.get_rect(bottomright = (randint(900, 1100), 210)))
             
             
             
