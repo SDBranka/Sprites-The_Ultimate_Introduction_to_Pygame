@@ -23,7 +23,7 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         # if player is on the ground and space bar is pressed player jump
         if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
-            self.gravity = -25
+            self.gravity = -21
 
     def apply_gravity(self):
         self.gravity += 1
@@ -95,43 +95,18 @@ def display_score():
     screen.blit(score_surface, score_rect)
     return current_time
 
-# determines obstacle type, moves obstacles, and deletes obstacles that have left the screen
-def obstacle_movement(obstacle_list):
-    if obstacle_list:
-        for obstacle_rect in obstacle_list:
-            obstacle_rect.x -= 5            
-            # determine which type of obstacle to draw and then draw
-            if obstacle_rect.bottom == 300:
-                screen.blit(snail_surface, obstacle_rect)
-            else:
-                screen.blit(fly_surface, obstacle_rect)
-        # delete obstacles that have left the screen
-        obstacle_list = [obstacle for obstacle in obstacle_list if obstacle.x > -100]
-        return obstacle_list
-    return []
-
-# determines if collision between obstacle and play occurs
-def collisions(player, obstacles):
-    if obstacles:
-        for obst_rect in obstacles:
-            if player.colliderect(obst_rect):
-                return False
-    return True
-
-# player animation; determine which image to draw to surface
-def player_animation():
-    global player_surface, player_index
-
-    # display jump surface when player is in the air
-    if player_rect.bottom < 300:
-        player_surface = player_jump
-    # play walking animation if the player is on the floor    
+# checks to see if a collision has occured between sprites, returns boolean value (to game_active)
+    # spritecollide(sprite_to_check, group_to_check, dokill) returns list of collided sprites
+        # if dokill is set to true on contact the group sprite would be deleted
+def collision_sprite():
+    sprite_to_check = player.sprite
+    group_to_check = obstacle_group
+    dokill = False
+    if pygame.sprite.spritecollide(sprite_to_check, group_to_check, dokill):
+        obstacle_group.empty()
+        return False
     else:
-        # increasing the index by small increments extends how many frames an index position is displayed for
-        player_index += 0.1
-        if player_index >= len(player_walk):
-            player_index = 0
-        player_surface = player_walk[int(player_index)]
+        return True
 
 
 # initialize pygame
@@ -236,6 +211,9 @@ while True:
         # display obstacles
         obstacle_group.draw(screen)
         obstacle_group.update()
+
+        # checks to see if collision has occured, if collision game_active is turned to False ending the game
+        game_active = collision_sprite()
 
     # if game_active is false(new game/player death) display intro/game over screen
     else:
